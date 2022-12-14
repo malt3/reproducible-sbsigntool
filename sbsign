@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+original_sbsign () {
+    local searchpath
+    local wrapperpath
+    searchpath=:$PATH:
+    wrapperpath=$(dirname "${BASH_SOURCE[0]}")
+    searchpath=${searchpath/:${wrapperpath}:/:}
+    searchpath=${searchpath%:}
+    searchpath=${searchpath#:}
+    PATH=$searchpath command -v sbsign
+}
+
+SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-0}"
+exec faketime -f "$(TZ=UTC date -d "@$SOURCE_DATE_EPOCH" +'%Y-%m-%d %H:%M:%S')" "$(original_sbsign)" "$@"
